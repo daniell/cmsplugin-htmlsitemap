@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _, get_language
 
@@ -7,7 +8,6 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cmsplugin_htmlsitemap import models
 import re
-
 
 class HtmlSitemapPlugin(CMSPluginBase):
     """HTML Sitemap CMS plugin."""
@@ -20,8 +20,11 @@ class HtmlSitemapPlugin(CMSPluginBase):
         site = Site.objects.get_current()
         pages = Page.objects.published(site=site).order_by('tree_id', 'lft')
         pages = pages.filter(level__gte=instance.level_min,
-                             level__lte=instance.level_max,
-                             publisher_is_draft=False)
+                             level__lte=instance.level_max)
+        if getattr(settings, 'CMS_MODERATOR', False):
+            pages.filter(publisher_is_draft=False)
+        else:
+            pages.filter(is_published=True)
         if not instance.in_navigation is None:
             pages = pages.filter(in_navigation=instance.in_navigation)
         if instance.match_language:
