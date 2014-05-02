@@ -1,5 +1,6 @@
 {% load mptt_tags %}
 <div id="sitemap">
+    <ul>
 	{% for page, structure in pages|tree_info %}
 		{% if structure.new_level %}
 		<ul>
@@ -14,4 +15,5 @@
 		</ul>
 		{% endfor %}
 	{% endfor %}
+	</ul>
 </div>
